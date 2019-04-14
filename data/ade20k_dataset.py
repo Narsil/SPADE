@@ -8,11 +8,10 @@ from data.image_folder import make_dataset
 
 
 class ADE20KDataset(Pix2pixDataset):
-
     @staticmethod
     def modify_commandline_options(parser, is_train):
         parser = Pix2pixDataset.modify_commandline_options(parser, is_train)
-        parser.set_defaults(preprocess_mode='resize_and_crop')
+        parser.set_defaults(preprocess_mode="resize_and_crop")
         if is_train:
             parser.set_defaults(load_size=286)
         else:
@@ -28,17 +27,19 @@ class ADE20KDataset(Pix2pixDataset):
 
     def get_paths(self, opt):
         root = opt.dataroot
-        phase = 'val' if opt.phase == 'test' else 'train'
+        phase = "val" if opt.phase == "test" else "train"
 
-        all_images = make_dataset(root, recursive=True, read_cache=False, write_cache=False)
+        all_images = make_dataset(
+            root, recursive=True, read_cache=False, write_cache=False
+        )
         image_paths = []
         label_paths = []
         for p in all_images:
-            if '_%s_' % phase not in p:
+            if "_%s_" % phase not in p:
                 continue
-            if p.endswith('.jpg'):
+            if p.endswith(".jpg"):
                 image_paths.append(p)
-            elif p.endswith('.png'):
+            elif p.endswith(".png"):
                 label_paths.append(p)
 
         instance_paths = []  # don't use instance map for ade20k
@@ -46,8 +47,8 @@ class ADE20KDataset(Pix2pixDataset):
         return label_paths, image_paths, instance_paths
 
     # In ADE20k, 'unknown' label is of value 0.
-    # Change the 'unknown' label to 255 to match other datasets.
+    # Change the 'unknown' label to the last label to match other datasets.
     def postprocess(self, input_dict):
-        label = input_dict['label']
+        label = input_dict["label"]
         label = label - 1
         label[label == -1] = self.opt.label_nc
