@@ -10,6 +10,8 @@ window.onload = function () {
   var mouseY = 0;
   context.strokeStyle = 'black'; // initial brush color
   context.lineWidth = 50; // initial brush width
+  context.lineCap="round";
+
   var isDrawing = false;
 
 
@@ -36,35 +38,29 @@ window.onload = function () {
 
   // Mouse Down Event
   canvas.addEventListener('mousedown', function(event) {
-    setMouseCoordinates(event);
     isDrawing = true;
-
-    // Start Drawing
-    context.beginPath();
-    context.moveTo(mouseX, mouseY);
+    context.save();
+    mouseX=canvas.pageX-this.offsetLeft;
+    mouseY=canvas.pageY-this.offsetTop
   });
 
   // Mouse Move Event
   canvas.addEventListener('mousemove', function(event) {
-    setMouseCoordinates(event);
-
     if(isDrawing){
-      context.lineTo(mouseX, mouseY);
+      context.beginPath();
+      context.moveTo(event.clientX-boundings.left,event.clientY-boundings.top);
+      context.lineTo(mouseX,mouseY);
       context.stroke();
+      context.closePath();
+      mouseX=event.clientX-boundings.left;
+      mouseY=event.clientY-boundings.top
     }
   });
 
   // Mouse Up Event
   canvas.addEventListener('mouseup', function(event) {
-    setMouseCoordinates(event);
     isDrawing = false;
   });
-
-  // Handle Mouse Coordinates
-  function setMouseCoordinates(event) {
-    mouseX = event.clientX - boundings.left;
-    mouseY = event.clientY - boundings.top;
-  }
 
   // Handle Clear Button
   var clearButton = document.getElementById('clear');
